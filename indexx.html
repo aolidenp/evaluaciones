@@ -1,0 +1,697 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Evaluaciones Dr. Romani</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f14;
+    --surface: #161921;
+    --surface2: #1e2230;
+    --border: #2a2f40;
+    --accent: #e8c86d;
+    --accent2: #7eb8f7;
+    --accent3: #a78bfa;
+    --text: #f0f2f8;
+    --muted: #7a82a0;
+    --danger: #f87171;
+    --success: #4ade80;
+    --warn: #fb923c;
+    --radius: 16px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Background texture */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(124,109,220,.12) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 40% at 90% 90%, rgba(232,200,109,.06) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrap { position: relative; z-index: 1; max-width: 480px; margin: 0 auto; padding: 0 16px 100px; }
+
+  /* Header */
+  header {
+    padding: 48px 0 32px;
+    text-align: center;
+  }
+  .greeting-label {
+    font-size: 11px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+  header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2.1rem;
+    line-height: 1.2;
+    color: var(--text);
+  }
+  header h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+  .subtitle {
+    margin-top: 10px;
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 300;
+  }
+  .notif-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 20px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 9px 18px;
+    border-radius: 50px;
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .notif-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .notif-btn.enabled { border-color: var(--success); color: var(--success); }
+  .notif-btn svg { width: 14px; height: 14px; }
+
+  /* Next eval hero */
+  .hero-card {
+    background: linear-gradient(135deg, #1b1f2e 0%, #1e2535 100%);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 24px;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-card::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 130px; height: 130px;
+    background: radial-gradient(circle, rgba(232,200,109,.18) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-label {
+    font-size: 10px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .hero-course {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.35rem;
+    line-height: 1.25;
+    margin-bottom: 4px;
+  }
+  .hero-eval {
+    color: var(--muted);
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
+  .hero-countdown {
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+  }
+  .cnt-block {
+    text-align: center;
+    background: var(--surface);
+    border-radius: 10px;
+    padding: 8px 14px;
+    min-width: 52px;
+  }
+  .cnt-num {
+    font-size: 1.6rem;
+    font-weight: 600;
+    line-height: 1;
+    color: var(--accent);
+    font-family: 'DM Serif Display', serif;
+  }
+  .cnt-lbl { font-size: 10px; color: var(--muted); margin-top: 2px; letter-spacing: .06em; }
+  .hero-date {
+    margin-left: auto;
+    text-align: right;
+    color: var(--muted);
+    font-size: 12px;
+    align-self: flex-end;
+    padding-bottom: 2px;
+  }
+
+  /* Filter tabs */
+  .tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab {
+    white-space: nowrap;
+    padding: 7px 16px;
+    border-radius: 50px;
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    transition: all .2s;
+  }
+  .tab.active { background: var(--accent); color: #0d0f14; border-color: var(--accent); font-weight: 600; }
+  .tab:hover:not(.active) { border-color: var(--muted); color: var(--text); }
+
+  /* Section title */
+  .section-title {
+    font-size: 11px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 600;
+    margin-bottom: 12px;
+    margin-top: 8px;
+  }
+
+  /* Eval cards */
+  .eval-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 10px;
+    transition: all .2s;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  .eval-card:hover { border-color: rgba(232,200,109,.3); transform: translateY(-1px); }
+  .eval-card.past { opacity: .5; }
+  .eval-card.soon { border-color: rgba(251,146,60,.35); }
+  .eval-card.soon::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--warn);
+    border-radius: 4px 0 0 4px;
+  }
+  .eval-card.very-soon { border-color: rgba(248,113,113,.4); }
+  .eval-card.very-soon::before {
+    background: var(--danger);
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    border-radius: 4px 0 0 4px;
+  }
+
+  .card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+  }
+  .card-course {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.35;
+    flex: 1;
+    padding-right: 12px;
+  }
+  .eval-badge {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 6px;
+    white-space: nowrap;
+    letter-spacing: .04em;
+  }
+  .badge-PC { background: rgba(126,184,247,.15); color: var(--accent2); }
+  .badge-TA { background: rgba(167,139,250,.15); color: var(--accent3); }
+  .badge-PA { background: rgba(74,222,128,.12); color: var(--success); }
+  .badge-EXFN { background: rgba(248,113,113,.15); color: var(--danger); }
+
+  .card-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .card-date { font-size: 12px; color: var(--muted); }
+  .days-pill {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 50px;
+  }
+  .days-future { background: rgba(232,200,109,.12); color: var(--accent); }
+  .days-soon { background: rgba(251,146,60,.15); color: var(--warn); }
+  .days-very-soon { background: rgba(248,113,113,.15); color: var(--danger); }
+  .days-past { background: rgba(122,130,160,.1); color: var(--muted); }
+  .days-today { background: rgba(74,222,128,.15); color: var(--success); }
+
+  /* Notes section */
+  .note-preview {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--muted);
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+  }
+  .note-preview svg { flex-shrink: 0; margin-top: 1px; }
+  .note-text { flex: 1; line-height: 1.5; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  /* Modal */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.7);
+    z-index: 100;
+    backdrop-filter: blur(4px);
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 24px 24px 0 0;
+    padding: 24px;
+    width: 100%;
+    max-width: 480px;
+    max-height: 85vh;
+    overflow-y: auto;
+    animation: slideUp .25s ease;
+  }
+  @keyframes slideUp {
+    from { transform: translateY(40px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  .modal-handle {
+    width: 36px; height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin: 0 auto 20px;
+  }
+  .modal-course {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.3rem;
+    margin-bottom: 4px;
+  }
+  .modal-meta {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 20px;
+  }
+  .modal-section { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: 600; margin-bottom: 8px; }
+  .notes-list { margin-bottom: 16px; }
+  .note-item {
+    background: var(--surface2);
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 8px;
+    font-size: 13px;
+    line-height: 1.5;
+    position: relative;
+  }
+  .note-item-meta {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+  .note-del {
+    position: absolute;
+    top: 10px; right: 10px;
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+    padding: 2px;
+    opacity: .5;
+    transition: opacity .15s;
+  }
+  .note-del:hover { opacity: 1; color: var(--danger); }
+  textarea {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    padding: 12px;
+    resize: vertical;
+    min-height: 80px;
+    outline: none;
+    transition: border-color .15s;
+  }
+  textarea:focus { border-color: var(--accent); }
+  .btn-row { display: flex; gap: 10px; margin-top: 12px; }
+  .btn {
+    flex: 1;
+    padding: 12px;
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all .15s;
+  }
+  .btn-primary { background: var(--accent); color: #0d0f14; }
+  .btn-primary:hover { opacity: .88; }
+  .btn-ghost { background: var(--surface2); color: var(--muted); }
+  .btn-ghost:hover { color: var(--text); }
+
+  /* Empty state */
+  .empty { text-align: center; color: var(--muted); padding: 40px 0; font-size: 14px; }
+
+  /* Bottom nav area */
+  .bottom-pad { height: 20px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="greeting-label">Panel de evaluaciones</div>
+    <h1>¡Hola, <em>Dr. Romani!</em></h1>
+    <p class="subtitle">Estas son sus próximas evaluaciones del ciclo Marzo 2026</p>
+    <button class="notif-btn" id="notifBtn" onclick="requestNotifications()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <span id="notifLabel">Activar notificaciones</span>
+    </button>
+  </header>
+
+  <!-- Hero: next eval -->
+  <div class="hero-card" id="heroCard"></div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab active" onclick="filterCards('all', this)">Todas</button>
+    <button class="tab" onclick="filterCards('PC', this)">Práctica (PC)</button>
+    <button class="tab" onclick="filterCards('TA', this)">Trabajo (TA)</button>
+    <button class="tab" onclick="filterCards('PA', this)">Parcial (PA)</button>
+    <button class="tab" onclick="filterCards('EXFN', this)">Examen Final</button>
+  </div>
+
+  <div class="section-title">Calendario de evaluaciones</div>
+  <div id="cardList"></div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-course" id="mCourse"></div>
+    <div class="modal-meta" id="mMeta"></div>
+    <div class="modal-section">Notas e ideas</div>
+    <div class="notes-list" id="mNotes"></div>
+    <div class="modal-section">Agregar nota</div>
+    <textarea id="mTextarea" placeholder="Escribe aquí tus observaciones, recordatorios o ideas sobre esta evaluación..."></textarea>
+    <div class="btn-row">
+      <button class="btn btn-ghost" onclick="closeModal()">Cerrar</button>
+      <button class="btn btn-primary" onclick="saveNote()">Guardar nota</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── DATA ─────────────────────────────────────────────────────────────────────
+const EVALS = [
+  // DERECHO PROCESAL CONSTITUCIONAL
+  { id: 'dpc-pc1',  course: 'Derecho Procesal Constitucional', type: 'PC1',  date: '2026-04-27', session: '001' },
+  { id: 'dpc-ta1',  course: 'Derecho Procesal Constitucional', type: 'TA1',  date: '2026-05-04', session: '001' },
+  { id: 'dpc-pc2',  course: 'Derecho Procesal Constitucional', type: 'PC2',  date: '2026-05-11', session: '001' },
+  { id: 'dpc-ta2',  course: 'Derecho Procesal Constitucional', type: 'TA2',  date: '2026-06-01', session: '001' },
+  { id: 'dpc-pa',   course: 'Derecho Procesal Constitucional', type: 'PA',   date: '2026-06-29', session: '001' },
+  { id: 'dpc-exfn', course: 'Derecho Procesal Constitucional', type: 'EXFN', date: '2026-07-20', session: '001' },
+  // DERECHO PENAL ESPECIAL
+  { id: 'dpe-pc1',  course: 'Derecho Penal Especial', type: 'PC1', date: '2026-04-27', session: '001' },
+  { id: 'dpe-pc2',  course: 'Derecho Penal Especial', type: 'PC2', date: '2026-05-18', session: '001' },
+  { id: 'dpe-pc3',  course: 'Derecho Penal Especial', type: 'PC3', date: '2026-06-08', session: '001' },
+  { id: 'dpe-pa',   course: 'Derecho Penal Especial', type: 'PA',  date: '2026-06-29', session: '001' },
+  { id: 'dpe-exfn', course: 'Derecho Penal Especial', type: 'EXFN',date: '2026-07-20', session: '001' },
+  // FILOSOFÍA DEL DERECHO
+  { id: 'fd-pc1',   course: 'Filosofía del Derecho', type: 'PC1', date: '2026-04-27', session: '001' },
+  { id: 'fd-pc2',   course: 'Filosofía del Derecho', type: 'PC2', date: '2026-05-18', session: '001' },
+  { id: 'fd-ta',    course: 'Filosofía del Derecho', type: 'TA',  date: '2026-06-08', session: '001' },
+  { id: 'fd-pa',    course: 'Filosofía del Derecho', type: 'PA',  date: '2026-06-29', session: '001' },
+  { id: 'fd-exfn',  course: 'Filosofía del Derecho', type: 'EXFN',date: '2026-07-20', session: '001' },
+  // DERECHOS HUMANOS
+  { id: 'dh-pc1',   course: 'Derechos Humanos', type: 'PC1',  date: '2026-04-27', session: '001' },
+  { id: 'dh-ta1',   course: 'Derechos Humanos', type: 'TA1',  date: '2026-05-04', session: '001' },
+  { id: 'dh-pc2',   course: 'Derechos Humanos', type: 'PC2',  date: '2026-06-22', session: '001' },
+  { id: 'dh-ta2',   course: 'Derechos Humanos', type: 'TA2',  date: '2026-06-22', session: '001' },
+  { id: 'dh-pa',    course: 'Derechos Humanos', type: 'PA',   date: '2026-06-29', session: '001' },
+  { id: 'dh-exfn',  course: 'Derechos Humanos', type: 'EXFN', date: '2026-07-20', session: '001' },
+];
+
+const TYPE_LABELS = {
+  PC1:'Práctica Calificada 1', PC2:'Práctica Calificada 2', PC3:'Práctica Calificada 3',
+  TA:'Trabajo Académico', TA1:'Trabajo Académico 1', TA2:'Trabajo Académico 2',
+  PA:'Examen Parcial', EXFN:'Examen Final'
+};
+const TYPE_KIND = e => e.startsWith('PC')?'PC': e.startsWith('TA')?'TA': e==='PA'?'PA':'EXFN';
+
+// ── UTILS ─────────────────────────────────────────────────────────────────────
+function parseDate(s) {
+  const [y,m,d] = s.split('-').map(Number);
+  return new Date(y, m-1, d);
+}
+function today() {
+  const n = new Date(); return new Date(n.getFullYear(), n.getMonth(), n.getDate());
+}
+function daysUntil(dateStr) {
+  return Math.round((parseDate(dateStr) - today()) / 86400000);
+}
+function fmtDate(dateStr) {
+  const d = parseDate(dateStr);
+  return d.toLocaleDateString('es-PE', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+}
+function fmtDateShort(dateStr) {
+  const d = parseDate(dateStr);
+  return d.toLocaleDateString('es-PE', { day:'numeric', month:'short', year:'numeric' });
+}
+
+// ── STORAGE ──────────────────────────────────────────────────────────────────
+function getNotes(evalId) {
+  try { return JSON.parse(localStorage.getItem('notes_' + evalId) || '[]'); } catch { return []; }
+}
+function saveNotes(evalId, arr) {
+  localStorage.setItem('notes_' + evalId, JSON.stringify(arr));
+}
+function getNotifEnabled() { return localStorage.getItem('notif') === '1'; }
+function setNotifEnabled(v) { localStorage.setItem('notif', v ? '1' : '0'); }
+
+// ── HERO ──────────────────────────────────────────────────────────────────────
+function renderHero() {
+  const upcoming = EVALS.filter(e => daysUntil(e.date) >= 0).sort((a,b)=>daysUntil(a.date)-daysUntil(b.date));
+  const hero = document.getElementById('heroCard');
+  if (!upcoming.length) { hero.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px">¡Ciclo completado!</div>'; return; }
+  const next = upcoming[0];
+  const days = daysUntil(next.date);
+  hero.innerHTML = `
+    <div class="hero-label">⚡ Próxima evaluación</div>
+    <div class="hero-course">${next.course}</div>
+    <div class="hero-eval">${TYPE_LABELS[next.type] || next.type} · ${fmtDateShort(next.date)}</div>
+    <div class="hero-countdown" id="heroCountdown">
+      ${days === 0 ? `<div class="cnt-block"><div class="cnt-num" style="color:var(--success)">HOY</div><div class="cnt-lbl">¡es hoy!</div></div>` : `
+      <div class="cnt-block"><div class="cnt-num" id="cdDays">${days}</div><div class="cnt-lbl">días</div></div>
+      <div class="cnt-block"><div class="cnt-num" id="cdHrs">--</div><div class="cnt-lbl">horas</div></div>
+      <div class="cnt-block"><div class="cnt-num" id="cdMin">--</div><div class="cnt-lbl">min</div></div>
+      `}
+      <div class="hero-date">${fmtDateShort(next.date)}</div>
+    </div>`;
+  if (days > 0) updateLiveCountdown(next.date);
+}
+
+function updateLiveCountdown(dateStr) {
+  function tick() {
+    const target = parseDate(dateStr);
+    target.setHours(8, 0, 0, 0);
+    const diff = target - Date.now();
+    if (diff <= 0) return;
+    const h = Math.floor(diff / 3600000) % 24;
+    const m = Math.floor(diff / 60000) % 60;
+    const s = Math.floor(diff / 1000) % 60;
+    const hEl = document.getElementById('cdHrs');
+    const mEl = document.getElementById('cdMin');
+    if (hEl) hEl.textContent = String(h).padStart(2,'0');
+    if (mEl) mEl.textContent = String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+  }
+  tick();
+  setInterval(tick, 1000);
+}
+
+// ── CARDS ────────────────────────────────────────────────────────────────────
+let activeFilter = 'all';
+function filterCards(f, el) {
+  activeFilter = f;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderCards();
+}
+
+function renderCards() {
+  const list = document.getElementById('cardList');
+  const sorted = [...EVALS].sort((a,b) => parseDate(a.date) - parseDate(b.date));
+  const filtered = activeFilter === 'all' ? sorted : sorted.filter(e => TYPE_KIND(e.type) === activeFilter);
+  if (!filtered.length) { list.innerHTML = '<div class="empty">Sin evaluaciones en este filtro.</div>'; return; }
+
+  list.innerHTML = filtered.map(e => {
+    const days = daysUntil(e.date);
+    const past = days < 0;
+    const soon = days >= 0 && days <= 7;
+    const verySoon = days >= 0 && days <= 2;
+    const kind = TYPE_KIND(e.type);
+    const notes = getNotes(e.id);
+    const lastNote = notes[notes.length-1];
+    const clazz = `eval-card${past?' past':''}${verySoon?' very-soon':soon?' soon':''}`;
+
+    let pillClass = 'days-future', pillText = `${days}d`;
+    if (past) { pillClass='days-past'; pillText=`hace ${Math.abs(days)}d`; }
+    else if (days === 0) { pillClass='days-today'; pillText='HOY'; }
+    else if (days <= 2) { pillClass='days-very-soon'; pillText=`${days}d ⚠️`; }
+    else if (days <= 7) { pillClass='days-soon'; pillText=`${days}d`; }
+
+    return `<div class="${clazz}" onclick="openModal('${e.id}')">
+      <div class="card-top">
+        <div class="card-course">${e.course}</div>
+        <span class="eval-badge badge-${kind}">${e.type}</span>
+      </div>
+      <div class="card-bottom">
+        <div class="card-date">${fmtDateShort(e.date)}</div>
+        <span class="days-pill ${pillClass}">${pillText}</span>
+      </div>
+      ${lastNote ? `<div class="note-preview">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        <span class="note-text">${lastNote.text}</span>
+      </div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+// ── MODAL ────────────────────────────────────────────────────────────────────
+let currentEvalId = null;
+function openModal(evalId) {
+  currentEvalId = evalId;
+  const e = EVALS.find(x => x.id === evalId);
+  const days = daysUntil(e.date);
+  document.getElementById('mCourse').textContent = e.course;
+  const dText = days < 0 ? `Hace ${Math.abs(days)} días` : days === 0 ? '¡Hoy!' : `Faltan ${days} días`;
+  document.getElementById('mMeta').textContent = `${TYPE_LABELS[e.type]||e.type} · ${fmtDate(e.date)} · ${dText}`;
+  document.getElementById('mTextarea').value = '';
+  renderNotesList(evalId);
+  document.getElementById('modalOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal(e) {
+  if (e && e.target !== document.getElementById('modalOverlay')) return;
+  document.getElementById('modalOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+  renderCards();
+}
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+  renderCards();
+}
+function renderNotesList(evalId) {
+  const notes = getNotes(evalId);
+  const container = document.getElementById('mNotes');
+  if (!notes.length) { container.innerHTML = '<div style="color:var(--muted);font-size:13px;margin-bottom:12px;">Aún no hay notas.</div>'; return; }
+  container.innerHTML = notes.map((n, i) => `
+    <div class="note-item">
+      <button class="note-del" onclick="deleteNote(${i})">×</button>
+      <div>${n.text}</div>
+      <div class="note-item-meta">${n.date}</div>
+    </div>`).join('');
+}
+function saveNote() {
+  const val = document.getElementById('mTextarea').value.trim();
+  if (!val) return;
+  const notes = getNotes(currentEvalId);
+  notes.push({ text: val, date: new Date().toLocaleString('es-PE') });
+  saveNotes(currentEvalId, notes);
+  document.getElementById('mTextarea').value = '';
+  renderNotesList(currentEvalId);
+}
+function deleteNote(idx) {
+  if (!confirm('¿Eliminar esta nota?')) return;
+  const notes = getNotes(currentEvalId);
+  notes.splice(idx, 1);
+  saveNotes(currentEvalId, notes);
+  renderNotesList(currentEvalId);
+}
+
+// ── NOTIFICATIONS ─────────────────────────────────────────────────────────────
+function updateNotifBtn() {
+  const btn = document.getElementById('notifBtn');
+  const lbl = document.getElementById('notifLabel');
+  if (Notification.permission === 'granted' && getNotifEnabled()) {
+    btn.classList.add('enabled');
+    lbl.textContent = '✓ Notificaciones activas';
+  } else {
+    btn.classList.remove('enabled');
+    lbl.textContent = 'Activar notificaciones';
+  }
+}
+function requestNotifications() {
+  if (!('Notification' in window)) { alert('Tu navegador no soporta notificaciones.'); return; }
+  if (Notification.permission === 'granted') {
+    setNotifEnabled(!getNotifEnabled());
+    updateNotifBtn();
+    if (getNotifEnabled()) scheduleNotifications();
+    return;
+  }
+  Notification.requestPermission().then(p => {
+    if (p === 'granted') { setNotifEnabled(true); updateNotifBtn(); scheduleNotifications(); }
+  });
+}
+function scheduleNotifications() {
+  const upcoming = EVALS.filter(e => { const d = daysUntil(e.date); return d >= 0 && d <= 3; });
+  upcoming.forEach(e => {
+    const d = daysUntil(e.date);
+    const body = d === 0 ? '¡Es HOY!' : `Faltan ${d} día${d>1?'s':''}.`;
+    new Notification(`📚 ${e.course}`, { body: `${TYPE_LABELS[e.type]||e.type} — ${body}`, icon: '' });
+  });
+  if (!upcoming.length) new Notification('Dr. Romani', { body: 'No hay evaluaciones en los próximos 3 días.' });
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+renderHero();
+renderCards();
+updateNotifBtn();
+</script>
+</body>
+</html>
